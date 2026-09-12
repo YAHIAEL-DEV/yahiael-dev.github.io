@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Portfolio</title>
+<style>
+  :root{
+    --bg:#0d1117; --card:#161b22; --border:#30363d;
+    --text:#e6edf3; --muted:#8b949e;
+    --accent1:#58a6ff; --accent2:#bc8cff;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Arial,sans-serif}
+  body{background:var(--bg);color:var(--text);line-height:1.6}
+
+  /* ===== Hero / Header ===== */
+  .hero{
+    max-width:900px;margin:0 auto;padding:70px 20px 40px;
+    display:flex;gap:24px;align-items:center;flex-wrap:wrap;
+  }
+  .avatar{
+    width:110px;height:110px;border-radius:50%;
+    border:3px solid var(--accent1);
+  }
+  .hero h1{font-size:2rem;
+    background:linear-gradient(90deg,var(--accent1),var(--accent2));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .hero p{color:var(--muted);max-width:560px}
+  .badges{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+  .badge{
+    background:var(--card);border:1px solid var(--border);
+    padding:5px 14px;border-radius:20px;font-size:.85rem;color:var(--muted);
+  }
+  .btn{
+    display:inline-block;margin-top:16px;padding:10px 22px;border-radius:8px;
+    background:linear-gradient(90deg,var(--accent1),var(--accent2));
+    color:#0d1117;font-weight:600;text-decoration:none;
+  }
+
+  /* ===== Sections ===== */
+  section{max-width:900px;margin:0 auto;padding:30px 20px}
+  h2{
+    font-size:1.4rem;margin-bottom:18px;padding-bottom:8px;
+    border-bottom:1px solid var(--border);
+  }
+
+  /* ===== Projects grid ===== */
+  .grid{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;
+  }
+  .card{
+    background:var(--card);border:1px solid var(--border);border-radius:12px;
+    padding:18px;display:flex;flex-direction:column;gap:10px;
+    transition:transform .15s,border-color .15s;text-decoration:none;color:inherit;
+  }
+  .card:hover{transform:translateY(-4px);border-color:var(--accent1)}
+  .card h3{font-size:1.05rem;color:var(--accent1)}
+  .card .desc{color:var(--muted);font-size:.9rem;flex:1}
+  .meta{display:flex;gap:14px;font-size:.8rem;color:var(--muted);flex-wrap:wrap}
+  .meta span{display:flex;align-items:center;gap:5px}
+  .dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+
+  /* ===== Skills ===== */
+  .skills{display:flex;flex-wrap:wrap;gap:10px}
+  .skill{
+    background:var(--card);border:1px solid var(--border);
+    padding:8px 18px;border-radius:8px;font-size:.9rem;
+  }
+
+  footer{
+    text-align:center;color:var(--muted);padding:40px 20px;font-size:.85rem;
+  }
+  #status{text-align:center;color:var(--muted);padding:40px}
+</style>
+<base target="_blank">
+</head>
+<body>
+
+<!-- ======= HEADER : les infos dialk ======= -->
+<header class="hero">
+  <img class="avatar" id="avatar" src="" alt="avatar">
+  <div>
+    <h1 id="name">...</h1>
+    <p id="bio">...</p>
+    <div class="badges">
+      <span class="badge" id="followers"></span>
+      <span class="badge" id="repos-count"></span>
+      <span class="badge" id="location"></span>
+    </div>
+    <a class="btn" id="profile-link" href="#" target="_blank">View GitHub Profile</a>
+  </div>
+</header>
+
+<!-- ======= SKILLS : kaytgenera otomatik mn languages dial repos ======= -->
+<section>
+  <h2>Skills</h2>
+  <div class="skills" id="skills"></div>
+</section>
+
+<!-- ======= PROJECTS : kayjibhom otomatik mn GitHub ======= -->
+<section>
+  <h2>Projects</h2>
+  <div id="status">Loading projects...</div>
+  <div class="grid" id="projects"></div>
+</section>
+
+<footer>Built with GitHub Pages — Updated automatically from my GitHub account</footer>
+
+<script>
+/* ============================================================
+   1) Beddel "YOUR_GITHUB_USERNAME" b smiya dial compte dyalek
+   ============================================================ */
+const USERNAME = "yahiael-dev";
+
+/* Ila bghiti t-affichi ghir projet mou7adadin, 7et smiyathom hna.
+   Ila khallitiha khawya, kayjib ga3 les repos. */
+const PINNED = []; // bhal: ["mon-cv", "site-ecommerce", "app-mobile"]
+
+const COLORS = {
+  JavaScript:"#f1e05a", TypeScript:"#3178c6", Python:"#3572A5",
+  HTML:"#e34c26", CSS:"#563d7c", Java:"#b07219", "C++":"#f34b7d",
+  "C#":"#178600", PHP:"#4F5D95", Go:"#00ADD8", Rust:"#dea584",
+  Ruby:"#701516", Swift:"#F05138", Kotlin:"#A97BFF", Dart:"#00B4AB"
+};
+
+async function load(){
+  if(USERNAME === "YOUR_GITHUB_USERNAME"){
+    document.getElementById("status").textContent =
+      "⚠️ Beddel USERNAME f fichier HTML (script) b smiya dyalek !";
+    return;
+  }
+  try{
+    const [user, repos] = await Promise.all([
+      fetch(`https://api.github.com/users/${USERNAME}`).then(r=>r.json()),
+      fetch(`https://api.github.com/users/${USERNAME}/repos?per_page=100&sort=updated`).then(r=>r.json())
+    ]);
+
+    document.getElementById("avatar").src = user.avatar_url;
+    document.getElementById("name").textContent = user.name || user.login;
+    document.getElementById("bio").textContent = user.bio || "";
+    document.getElementById("followers").textContent = `⭐ ${user.followers} followers`;
+    document.getElementById("repos-count").textContent = `📦 ${user.public_repos} repos`;
+    document.getElementById("location").textContent = user.location || "";
+    document.getElementById("profile-link").href = user.html_url;
+
+    let list = repos.filter(r => !r.fork);
+    if(PINNED.length){
+      list = PINNED.map(n => repos.find(r => r.name === n)).filter(Boolean);
+    }
+    document.getElementById("status").style.display = "none";
+
+    /* Skills = languages li kayst3melhom */
+    const langs = [...new Set(list.map(r => r.language).filter(Boolean))];
+    document.getElementById("skills").innerHTML = langs
+      .map(l => `<span class="skill">${l}</span>`).join("");
+
+    document.getElementById("projects").innerHTML = list.map(r => `
+      <a class="card" href="${r.html_url}" target="_blank">
+        <h3>${r.name}</h3>
+        <p class="desc">${r.description || "No description"}</p>
+        <div class="meta">
+          ${r.language ? `<span><span class="dot" style="background:${COLORS[r.language]||"#8b949e"}"></span>${r.language}</span>` : ""}
+          <span>⭐ ${r.stargazers_count}</span>
+          <span>⑂ ${r.forks_count}</span>
+          <span>🕒 ${new Date(r.updated_at).toLocaleDateString()}</span>
+        </div>
+      </a>`).join("");
+  }catch(e){
+    document.getElementById("status").textContent = "Error loading projects 😢";
+  }
+}
+load();
+</script>
+</body>
+</html>
